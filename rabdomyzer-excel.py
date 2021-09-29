@@ -22,70 +22,70 @@ def format_worksheet(workbook, worksheet):
     format_green = workbook.add_format({'bg_color' : '#66FF66'})
     #format_orange = workbook.add_format({'bg_color' : '#FFA500'})
 
-    #worksheet.conditional_format('AU2:AU1000000', {'type':     'text',
-    #                                       'criteria': 'containing',
-     #                                      'value':    'tolerated',
-      #                                     'format':   format_green})
-    
-    #worksheet.conditional_format('AU2:AU1000000', {'type':     'text',
-     #                                      'criteria': 'containing',
-      #                                     'value':    'deleterious',
-       #                                    'format':   format_red})
-    
-    
-    worksheet.conditional_format('AF2:AF1000000', {'type':     'text',                                    ##Sift
-                                           'criteria': 'begins with',
-                                           'value':    'D',
-                                           'format':   format_red})
-    
-    worksheet.conditional_format('AF2:AF1000000', {'type':     'text',
-                                           'criteria': 'begins with',
-                                           'value':    'T',
+    worksheet.conditional_format('AU2:AU1000000', {'type':     'text',
+                                           'criteria': 'containing',
+                                           'value':    'tolerated',
                                            'format':   format_green})
     
-    worksheet.conditional_format('AE2:AE1000000', {'type':     'text',                                      ##polyphen
-                                           'criteria': 'begins with',
+    worksheet.conditional_format('AU2:AU1000000', {'type':     'text',
+                                           'criteria': 'containing',
+                                           'value':    'deleterious',
+                                           'format':   format_red})
+    
+    
+    worksheet.conditional_format('AV2:AV1000000', {'type':     'text',
+                                           'criteria': 'containing',
+                                           'value':    'damaging',
+                                           'format':   format_red})
+    
+    worksheet.conditional_format('AV2:AV1000000', {'type':     'text',
+                                           'criteria': 'containing',
+                                           'value':    'benign',
+                                           'format':   format_green})
+    
+    worksheet.conditional_format('AX2:AX1000000', {'type':     'text',
+                                           'criteria': 'containing',
                                            'value':    'D',
                                            'format':   format_red})
                                            
-    worksheet.conditional_format('AE2:AE1000000', {'type':     'text',
-                                           'criteria': 'begins with',
-                                           'value':    'B',
+    worksheet.conditional_format('AX2:AX1000000', {'type':     'text',
+                                           'criteria': 'containing',
+                                           'value':    'T',
                                            'format':   format_green})
                                           
-    worksheet.conditional_format('AD2:AD1000000', {'type':     'cell',
+    worksheet.conditional_format('AW2:AW1000000', {'type':     'cell',
                                            'criteria': 'greater than or equal to',
                                            'value':    '15',
                                            'format':   format_red})
-    #worksheet.conditional_format('AY2:AY1000000', {'type':     'cell',
-     #                                      'criteria': 'greater than or equal to',
-      #                                     'value':    '0.5',
-       #                                    'format':   format_red})
+    worksheet.conditional_format('AY2:AY1000000', {'type':     'cell',
+                                           'criteria': 'greater than or equal to',
+                                           'value':    '0.5',
+                                           'format':   format_red})
                                            
-    #worksheet.conditional_format('AZ2:AZ1000000', {'type':     'cell',
-     #                                      'criteria': 'greater than or equal to',
-      #                                     'value':    '3',
-       #                                    'format':   format_red})                                                                              
+    worksheet.conditional_format('AZ2:AZ1000000', {'type':     'cell',
+                                           'criteria': 'greater than or equal to',
+                                           'value':    '3',
+                                           'format':   format_red})                                                                              
     
-    #worksheet.conditional_format('BA2:BA1000000', {'type':     'cell',
-     #                                      'criteria': 'greater than or equal to',
-      #                                     'value':    '0.5',
-       #                                    'format':   format_red}) 
+    worksheet.conditional_format('BA2:BA1000000', {'type':     'cell',
+                                           'criteria': 'greater than or equal to',
+                                           'value':    '0.5',
+                                           'format':   format_red}) 
                                            
-    #worksheet.conditional_format('BB2:BB1000000', {'type':     'cell',
-     #                                      'criteria': 'greater than or equal to',
-      #                                     'value':    '0.5',
-       #                                    'format':   format_red})
+    worksheet.conditional_format('BB2:BB1000000', {'type':     'cell',
+                                           'criteria': 'greater than or equal to',
+                                           'value':    '0.5',
+                                           'format':   format_red})
 
-    #worksheet.conditional_format('BC2:BC1000000', {'type':     'text',
-     #                                      'criteria': 'containing',
-      #                                     'value':    'PASS',
-       #                                    'format':   format_red})
+    worksheet.conditional_format('BC2:BC1000000', {'type':     'text',
+                                           'criteria': 'containing',
+                                           'value':    'PASS',
+                                           'format':   format_red})
 
-    #worksheet.conditional_format('BC2:BC1000000', {'type':     'text',
-     #                                      'criteria': 'containing',
-      #                                     'value':    'FAIL',
-       #                                    'format':   format_green})
+    worksheet.conditional_format('BC2:BC1000000', {'type':     'text',
+                                           'criteria': 'containing',
+                                           'value':    'FAIL',
+                                           'format':   format_green})
     
     return worksheet
      
