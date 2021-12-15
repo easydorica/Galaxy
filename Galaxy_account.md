@@ -23,7 +23,7 @@
 
 ## Provare a lanciare uno dei tool presenti
 * Nella sezione di sinistra denominata "Tools", nella relativa barra di ricerca scrivere "BWA" quindi scegliere dalla lista ottenuta il tool "**Map with BWA-MEM - map medium and long reads (> 100 bp) against reference genome (Galaxy Version 0.7.17.2)**". Questo tool viene utilizzato per l'allineamento delle reads al genoma di riferimento, generando a partire dai fastq un file .bam.
-- A questo punto nella sezione centrale della schermata di esecuzione dei programma compilare come segue i diversi parametri del tool:
+- A questo punto nella sezione centrale della schermata di esecuzione del programma compilare come segue i diversi parametri del tool:
   - dal menù a tendina dell'opzione "**Using reference genome**" scegliere **hg19**
   - dal menù a tendina dell'opzione "**Single or Paired-end reads**" scegliere **Paired**
   - dal menù a tendina dell'opzione "**Select first set of reads**" selezionare il fastq nominato **sample1-f** e in "**Select second set of reads**" selezionare **sample1-r**
