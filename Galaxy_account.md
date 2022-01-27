@@ -1,15 +1,44 @@
-## Creare un account Galaxy 
-* Accedere al nostro terminal server “genmedts", aprendo dal menù di Windows l'applicazione “Connessione Desktop Remoto”, e inserire le credenziali personali di accesso.
-* Nella schermata di connessione al desktop remoto aprire un qualsiasi browser (es. Googe Chrome).
+# Sommario
+1. [Accedere all'istanza Galaxy](#accesso)
+2. [Introduzione al workflow di analisi di panneli genici (amplicon-based)](#introduzione)
+
+
+
+## Accedere all'istanza Galaxy "https://galaxy.aosp.biodec.com/" <a name="accesso"></a>
+* Aprire un qualsiasi browser (es. Googe Chrome).
 * Nella barra degli indirizzi del browser inserire l'indirizzo  [https://galaxy.aosp.biodec.com](https://galaxy.aosp.biodec.com), al quale è raggiungibile l'istanza Galaxy presente sul nostro server.
-* Dal menù di testata, in alto a destra, click "**Login or Register**" e sulla finestra di dialogo in basso click "**Register here**".
+* Dal menù di testata, in alto a destra, click "**Login or Register**" ed inserire le proprie credenziali di acceso (email personale e password) richieste nella finestra di dialogo.
 
-![Galaxy1](https://user-images.githubusercontent.com/89908049/146198544-329b06d5-cbc0-471c-bbfd-17f696a9b8c1.png)
+## Introduzione al workflow di analisi di panneli genici (amplicon-based) <a name="introduzione"></a>
+**"SNP/InDels calling pipeline"** è un workflow di analisi dedicato alla chiamata di varianti a singolo nucleotide e piccole inserzioni/delezioni da dati di pannelli genici NGS ottenuti con il metodo basato su ampliconi e la tecnologia di sequenziamento Ion Torrent, usando per l'allineamento il genoma di riferimento hg19.
+Il workflow è stato costruito concatenando diversi subworkflow ogniuno dei quali rappresenta uno step dell'analisi bioinformatica.
 
-* Compilare la finestra di dialogo con le informazioni richieste (email personale e password).
-* Una volta creato l'account procedere al login utilizzando le credenziali usate per la registrazione.
+![immagine1](https://user-images.githubusercontent.com/89908049/151352349-5f94dca7-ed97-48e9-98dd-8762a2670f71.png)
 
-## Caricare un file di prova
+> **_STEP_1:_** (FASTQ quality check): This workflow performs a quality control check on sequence data in fastq format. The analysis is performed by two tools (__FastQC and fastp__) which provide a quick overview of whether the data looks good and there are no problems or biases which may affect downstream analysis. Results and evaluations are returned in the form of charts and tables summarized in MultiQC report. 
+The final output will be a collection of fastq files containing the trimmed reads.
+`FastQC` `fastp`
+
+> **_STEP_2:_** (alignment): This workflow performs the alignment of the previously processed reads to the reference genome hg19 using BWA-MEM.
+`BWA_MEM` `Samtools` `Picard`
+
+> **_STEP_3:_** (Calling to create a multi-sample VCF): This workflow starts with aligned sequencing data (BAMs) of multiple individuals, and ends with a single multi-sample VCF file comprising all analyzed samples and only the genomic position within the target regions where at least one indivudal has a mutation or a polymorphism. Low-quality variants are flagged in the final VCF file and calling statistics are summarized in the final MultiQC report.
+`bcftools`
+
+> **_STEP_4:_** (MultiQc report): This step creates a single report visualising quality metrics resulting from multiple tools (FastQC, fastp, samtools flagstat, bcftools stats) across many samples.
+> `MultiQC`
+
+> **_STEP_5:_** (Variant annotation): This workflow performs annotation of SNPs and short indels contained in the input VCF file, including also funcional annotation such as: scores of predicted impacts (SIFT, PolyPhen, CADD)-clinical significance (Clinvar)-dbSNP identifiers-allele frequencies (GnomAD)
+`SnpEFF` `SnpSift` **`Extraeff`**
+
+```
+Extraeff è un tool custom utilizzato per coinciliare i comportamenti dei diversi tool di annotazione e armonizzare il formato di annotazione del vcf, cosi da renderlo analizzabile dal tool Rabdomyzer. xtraeff ricerca le annotazioni di SnpSift che sono elencate nel file di annotazione e le integra nelle annotazioni di SNPEff, generando un file VCF in cui le annotazioni di interesse sono tutte separate da “|”.
+```
+
+![image](/uploads/897c55090bfde68a1d126993d58df9d3/image.png)
+
+
+
 * Dalla barra di menù in alto click "Shared Data" e dal menù a tendina selezionare "**Data Libraries**"
 ![galaxy2](https://user-images.githubusercontent.com/89908049/146207844-ae8a9b61-c045-4c3d-959e-4edc9b1c9f8f.png)
 * Dalla schermata che si ottiene click "**Test**", quindi spuntare entramabi i file con estensione fastqsanger.gz presenti.
