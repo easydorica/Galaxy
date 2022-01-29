@@ -1,43 +1,151 @@
-## Creare un account Galaxy 
-* Accedere al nostro terminal server “genmedts", aprendo dal menù di Windows l'applicazione “Connessione Desktop Remoto”, e inserire le credenziali personali di accesso.
-* Nella schermata di connessione al desktop remoto aprire un qualsiasi browser (es. Googe Chrome).
+# Guida pratica al corso Galaxy
+
+# Sommario
+1. [Accedere all'istanza Galaxy](#accesso)
+2. [Introduzione al workflow di analisi per panneli genici (amplicon-based)](#introduzione)
+3. [Lanciare un workflow condiviso](#workflow1)
+4. [Creare un workflow combinando più subworkflow](#workflow2)
+5. [Utilizzo di Rabdomyzer in Galaxy](#Rabdomyzer)
+
+## :computer: Accedere all'istanza Galaxy "https://galaxy.aosp.biodec.com/" <a name="accesso"></a>
+* Aprire un qualsiasi browser (es. Googe Chrome).
 * Nella barra degli indirizzi del browser inserire l'indirizzo  [https://galaxy.aosp.biodec.com](https://galaxy.aosp.biodec.com), al quale è raggiungibile l'istanza Galaxy presente sul nostro server.
-* Dal menù di testata, in alto a destra, click "**Login or Register**" e sulla finestra di dialogo in basso click "**Register here**".
+* Dal menù di testata, in alto a destra, click "**Login or Register**" ed inserire le proprie credenziali di acceso (email personale e password) richieste nella finestra di dialogo.
 
-![Galaxy1](https://user-images.githubusercontent.com/89908049/146198544-329b06d5-cbc0-471c-bbfd-17f696a9b8c1.png)
+## Introduzione al workflow di analisi per panneli genici (amplicon-based) <a name="introduzione"></a>
+**"SNP/InDels calling pipeline"** è un workflow di analisi dedicato alla chiamata di varianti a singolo nucleotide e piccole inserzioni/delezioni da dati di pannelli genici NGS ottenuti con il metodo basato su ampliconi e la tecnologia di sequenziamento Ion Torrent, usando per l'allineamento il genoma di riferimento hg19.
+Il workflow è stato costruito concatenando diversi subworkflow ogniuno dei quali rappresenta uno step dell'analisi bioinformatica.
 
-* Compilare la finestra di dialogo con le informazioni richieste (email personale e password).
-* Una volta creato l'account procedere al login utilizzando le credenziali usate per la registrazione.
+![immagine](https://user-images.githubusercontent.com/89908049/151522286-a60cd3ac-af1e-44ae-8c33-4a8c482e48de.png)
 
-## Caricare un file di prova
-* Dalla barra di menù in alto click "Shared Data" e dal menù a tendina selezionare "**Data Libraries**"
-![galaxy2](https://user-images.githubusercontent.com/89908049/146207844-ae8a9b61-c045-4c3d-959e-4edc9b1c9f8f.png)
-* Dalla schermata che si ottiene click "**Test**", quindi spuntare entramabi i file con estensione fastqsanger.gz presenti.
-* Dal menù in alto click su "**Export to History**" e dal menu a tendina selezionare "**as Datasets**". Quindi nella finestra di dialogo che appare click "**Import**"
+> **_STEP_1:_** (FASTQ quality check): This workflow performs a quality control check on sequence data in fastq format. The analysis is performed by two tools (__FastQC and fastp__) which provide a quick overview of whether the data looks good and there are no problems or biases which may affect downstream analysis. Results and evaluations are returned in the form of charts and tables summarized in MultiQC report. 
+The final output will be a collection of fastq files containing the trimmed reads.  
+:tools: `FastQC` `fastp`
 
-![galaxy3](https://user-images.githubusercontent.com/89908049/146209498-37cb6d11-b8b0-4b7d-b52d-e8b3bf5deea6.png)
+> **_STEP_2:_** (alignment): This workflow performs the alignment of the previously processed reads to the reference genome hg19 using BWA-MEM.  
+:tools: `BWA_MEM` `Samtools` `Picard`
 
-* A questo punto i due fastq selezionati dovranno apparire  nella sezione di destra della schermata principale, denominata "History" e destinata all'archiviazione dei file in galaxy.
+> **_STEP_3:_** (Calling to create a multi-sample VCF): This workflow starts with aligned sequencing data (BAMs) of multiple individuals, and ends with a single multi-sample VCF file comprising all analyzed samples and only the genomic position within the target regions where at least one indivudal has a mutation or a polymorphism. Low-quality variants are flagged in the final VCF file and calling statistics are summarized in the final MultiQC report.  
+:tools: `bcftools`
 
-![galaxy4](https://user-images.githubusercontent.com/89908049/146211223-bd1094cf-73e5-4864-8ed2-8fad9bbe4dbb.png)
+> **_STEP_4:_** (MultiQc report): This step creates a single report visualising quality metrics resulting from multiple tools (FastQC, fastp, samtools flagstat, bcftools stats) across many samples.  
+:tools: `MultiQC`
 
-## Provare a lanciare uno dei tool presenti
-* Nella sezione di sinistra denominata "Tools", nella relativa barra di ricerca scrivere "BWA" quindi scegliere dalla lista ottenuta il tool "**Map with BWA-MEM - map medium and long reads (> 100 bp) against reference genome (Galaxy Version 0.7.17.2)**". Questo tool viene utilizzato per l'allineamento delle reads al genoma di riferimento, generando a partire dai fastq un file .bam.
-- A questo punto nella sezione centrale della schermata di esecuzione del programma compilare come segue i diversi parametri del tool:
-  - dal menù a tendina dell'opzione "**Using reference genome**" scegliere **hg19**
-  - dal menù a tendina dell'opzione "**Single or Paired-end reads**" scegliere **Paired**
-  - dal menù a tendina dell'opzione "**Select first set of reads**" selezionare il fastq nominato **sample1-f** e in "**Select second set of reads**" selezionare **sample1-r**
- - Quindi premere il pulsante in fondo "**Execute**"
- - L'output in elaborazione comparirà nella sezione di destra in arancione. Soltanto se il processo verrà portato a termine correttamente l'output verrà colorato di verde.
+> **_STEP_5:_** (Variant annotation): This workflow performs annotation of SNPs and short indels contained in the input VCF file, including also funcional annotation such as: scores of predicted impacts (SIFT, PolyPhen, CADD)-clinical significance (Clinvar)-dbSNP identifiers-allele frequencies (GnomAD)  
+:tools: `SnpEFF` `SnpSift` **`Extraeff`**   
+>
+>       Extraeff:è un tool custom utilizzato per coinciliare i comportamenti dei 
+>       diversi tool di annotazione e armonizzare il formato di annotazione del vcf, cosi da 
+>       renderlo analizzabile dal tool Rabdomyzer. Extraeff ricerca le annotazioni di SnpSift 
+>       che sono elencate nel file di annotazione e le integra nelle annotazioni di SnpEFF,
+>       generando un file vcf in cui le annotazioni d'interesse sono tutte separate da "|".
 
-![galaxy5](https://user-images.githubusercontent.com/89908049/146215847-b8bc8b14-904e-4d70-b0bd-e67584c43952.png)
+L'output conclusivo di questo workflow è un file vcf multisample annotato comprendente tutti i campioni analizzati e solo le posizioni genomiche alternative (in almeno un individuo della coorte) all'interno delle regioni target.
+Questo file vcf puo essere utilizzato come input del workflow **Rabdomyzer**, che rappresenta lo **STEP_6** della nostra analisi.
 
-## Visualizzare un BAM su IGV
-* Senza chiudere la pagina del browser relativa a galaxy, ritornare sul desktop ed aprire una qualsiasi delle versioni disponibili di IGV, facendo doppio click sull'icona relativa (es: igv6G). Quindi attendere l'apertura del programma e il caricamento del genoma di riferimento (Human hg19).
-* Tenendo aperta la finestra di IGV, riaprire la schermata di galaxy
-* Una volta completato il porcesso di allineamento (il box relativo all'output deve essere verde), click sull'output di BWA-MEM all'interno della history quindi scegliere "**display with IGV**" facendo click su **local**.
-* Automaticamente il bam verrà caricato nella finestra di IGV precedentemente aperta.
-* Per visualizzare il contenuto del bam, scrivere **chrM** nella finestra di navigazione e premere invio.
-Dovreste visualizzare il nome del file bam nella sezione di sinistra della schermata di IGV e vedere le reads allineate al centro.
+![immagine](https://user-images.githubusercontent.com/89908049/151382830-d1201d0c-7031-437c-a30a-4c83eae02b52.png)
 
-![desktopgalaxy](https://user-images.githubusercontent.com/89908049/146219184-bdff24a1-1dd7-498f-be41-5746f6748c53.png "output atteso")
+> **_STEP_6:_** (Rabdomyzer): Rabdomyzer is a tool used to interpret single nucleotide variants (SNVs) and small insertions and deletions (InDels), simplifying NGS results visualization. 
+It enables filtering variants based on minor allele frequency (MAF) and established inheritance pattern, defined in the specified model file.
+At the end of the process, Rabdomyzer generates outputs of variant interpretation results in text format splitted in herezygous, homozygous and (if possible) compound heterozygous genetic variants and an excel file merging all txt outputs.  
+:tools: `Rabdomyzer`
+
+## :computer: Lanciare un workflow condiviso <a name="workflow1"></a>
+* Dalla barra di menù in alto click **Shared Data** e dal menù a tendina click **Data Libraries**
+* Click sulla cartella **corso_aosp**
+* Seleziona "sample1" e "sample2" e click **Export to History as a Collection**. Creare una collection come **List** e assegnare un nome (es:Fastq)
+
+![immagine](https://user-images.githubusercontent.com/89908049/151391444-fd7d9202-0125-48b6-aca0-8236f9c9a61c.png)
+
+* Click su :homes: per tornare alla schermata principale. Nella propria History sarà possibile visualizzare la collection appena importata.
+* Dalla barra di menù in alto click **Shared Data** e dal menù a tendina click **Workflows**
+* Click sul workflow **Quality_check+alignment** e dal menù a tendina click **Run**
+
+![immagine](https://user-images.githubusercontent.com/89908049/151392744-92ed07f6-1046-40d6-904a-eead3d580c2d.png)
+
+* Compila il form con le informazioni richieste:
+  * Fastq input dataset collection
+  * Library name (LB)
+  * Date that run was produced (DT)  
+Quindi click su **Run Workflow**
+
+![immagine](https://user-images.githubusercontent.com/89908049/151394762-50f1cb92-bc21-4ad4-9ce6-1ac83b57666b.png)
+
+## :computer: Creare un workflow combinando più subworkflow <a name="workflow2"></a>
+* Per importare un workflow condiviso click **Shared Data** e dal menù a tendina click **Workflows**
+* Click sul workflow **Calling to create a multi-sample VCF** e dalla menù a tendina click **Import**. Una volta completata l'operazione ritorna alla pagina precedente.
+* Ripetere la stessa operazione anche per i workflow **Variant annotation** e **Rabdomyzer**
+* Tornare alla schermata principale :homes: 
+* Dalla barra di menù in alto click **Workflow** e in alto a destra click :heavy_plus_sign: **Create**
+* Assegnare un nome al workflow che s'intende creare (es:vcf_analysis) e click su **Create**
+* Dalla sezione **Tools** selezionare **Workflows**
+* Click sul nome dei subworkflow che s'intende inserire.
+* Ordinare i subworkflows, collegando gli output del primo box agli input del secondo, e cosi via.
+
+![immagine](https://user-images.githubusercontent.com/89908049/151401536-a5f7cdfd-536a-4670-8852-06e35b255798.png)
+
+* Per inserire l'input del workflow, dalla sezione **Tools** selezionare **Inputs** e quindi click su **Input dataset collection**. 
+
+![immagine](https://user-images.githubusercontent.com/89908049/151402844-03c02d50-d921-41f5-9c27-d60b0b2b7288.png)
+
+* Per inserire i file target e quelli di annotazione richiesti nel subworkflow per l'annotazione e/o da Rabdomyzer, slezionare **Input dataset** dalla sezione **Inputs**.  
+> :exclamation: è importante assegare una **Label** a tutti i dataset di input.
+
+![immagine](https://user-images.githubusercontent.com/89908049/151403771-3fd2f772-796d-4346-96cd-5c3e92e33804.png)
+
+* Una volta completata la creazione del workflow click in alto a destra su :floppy_disk: **Save Workflow**
+
+* Prima di lanciare il workflow, fare l'import all'interno della propria History dei file di annotazione richiesti:
+   - `Shared Data`  
+   - `Data Libraries` 
+      - :file_folder: corso_aosp 
+         - :file_folder: Annotation 
+           - :page_facing_up: spunta tutti i file 
+           - :closed_book: `Export to History` 
+           - `as Datasets` 
+    - `Data Libraries`
+       - :file_folder: VCF database
+         - :page_facing_up: spunta _"clinvar_20210718.vcf"_ e _"gnomad.exomes.r2.1.1.sites_customann.vcf"_
+         - :closed_book: `Export to History`
+         - - `as Datasets` 
+
+* Dalla schermata principale, click **Workflow** e dalla lista selezionare quello appena creato.
+* click su :arrow_forward: (Run workflow)
+* Compila il form con le informazioni richieste. Quindi click su **Run Workflow**.
+
+ ![immagine](https://user-images.githubusercontent.com/89908049/151519731-385e320b-ddb9-4e86-bb95-f2784078f662.png)
+
+## :computer: Utilizzo di Rabdomyzer in Galaxy <a name="Rabdomyzer"></a>
+
+> :book: Rabdomyzer è un programma "custom" sviluppato per interpretare le varianti a singolo nucleotide (SNV) e le piccole inserzioni e delezioni (InDels), semplificando la visualizzazione dei risultati NGS.
+Consente di filtrare le varianti in base alla frequenza degli alleli minori (MAF) e al modello di ereditarietà stabilito, definito nel file model specificato.
+Il modello potrà essere:  
+ **_"trio"_** se nelle colonne dei genitori verrà specificato il loro ID (_variant and gene based analysis_)
+**_"singolo"_** se entrambe le colonne dei genitori contengono 0 (_variant based filtering_).
+
+![immagine](https://user-images.githubusercontent.com/89908049/151526447-12b55d2e-c52b-4fc8-9c7e-e87be027c028.png)
+
+> Alla fine del processo, Rabdomyzer genera output in formato testuale contenenti le varianti suddivise in varianti genetiche erezigoti, omozigoti e (se possibile) eterozigoti composte e un file excel che unisce tutti gli output txt.
+
+* Per iniziare importare nella propria History il file vcf condiviso negli `Shared Data`:
+ - `Shared Data`  
+   - `Data Libraries` 
+      - :file_folder: corso_aosp
+         - :page_facing_up: spunta _"vcf_multisample.vcf"
+         - :closed_book: `Export to History`
+         - `as Datasets` 
+* Crea un file model come da esempio
+
+| proband | father | mother | control | unknown |
+| ------ | ------ | ------ | ------ | ------ |
+| BE45 | 0 | 0 | 0 | 0 |
+
+:exclamation: utilizzare il TAB come separatore 
+
+* Richiamare il tool **Rabdomyzer** dalla sezione **Tools** nella schermata principale della nostra istanza Galaxy
+* Click su **Rabdomyzer filtration**
+* Compila il form con le informazioni richieste. Quindi click su **Execute**.
+
+![immagine](https://user-images.githubusercontent.com/89908049/151532146-519cf3c9-867c-4702-80dd-1fdd8512cf6f.png)
+
+* :eye: visualizzare il file excel ottenuto
