@@ -7,7 +7,7 @@
 4. [Creare un workflow combinando più subworkflow](#workflow2)
 5. [Utilizzo di Rabdomyzer in Galaxy](#Rabdomyzer)
 
-## :computer: Accedere all'istanza Galaxy "https://galaxy.aosp.biodec.com/" <a name="accesso"></a>
+## 🖥️ Accedere all'istanza Galaxy "https://galaxy.aosp.biodec.com/" <a name="accesso"></a>
 * Aprire un qualsiasi browser (es. Googe Chrome).
 * Nella barra degli indirizzi del browser inserire l'indirizzo  [https://galaxy.aosp.biodec.com](https://galaxy.aosp.biodec.com), al quale è raggiungibile l'istanza Galaxy presente sul nostro server.
 * Dal menù di testata, in alto a destra, click "**Login or Register**" ed inserire le proprie credenziali di acceso (email personale e password) richieste nella finestra di dialogo.
@@ -20,21 +20,21 @@ Il workflow è stato costruito concatenando diversi subworkflow ogniuno dei qual
 
 > **_STEP_1:_** (FASTQ quality check): This workflow performs a quality control check on sequence data in fastq format. The analysis is performed by two tools (__FastQC and fastp__) which provide a quick overview of whether the data looks good and there are no problems or biases which may affect downstream analysis. Results and evaluations are returned in the form of charts and tables summarized in MultiQC report. 
 The final output will be a collection of fastq files containing the trimmed reads.  
-:tools: `FastQC` `fastp`
+🔧 `FastQC` `fastp`
 
 > **_STEP_2:_** (alignment): This workflow performs the alignment of the previously processed reads to the reference genome hg19 using BWA-MEM.  
-:tools: `BWA_MEM` `Samtools` `Picard`
+🔧 `BWA_MEM` `Samtools` `Picard`
 
 > **_STEP_3:_** (Calling to create a multi-sample VCF): This workflow starts with aligned sequencing data (BAMs) of multiple individuals, and ends with a single multi-sample VCF file comprising all analyzed samples and only the genomic position within the target regions where at least one indivudal has a mutation or a polymorphism. Low-quality variants are flagged in the final VCF file and calling statistics are summarized in the final MultiQC report.  
-:tools: `bcftools`
+🔧 `bcftools`
 
 > **_STEP_4:_** (MultiQc report): This step creates a single report visualising quality metrics resulting from multiple tools (FastQC, fastp, samtools flagstat, bcftools stats) across many samples.  
-:tools: `MultiQC`
+🔧 `MultiQC`
 
 > **_STEP_5:_** (Variant annotation): This workflow performs annotation of SNPs and short indels contained in the input VCF file, including also funcional annotation such as: scores of predicted impacts (SIFT, PolyPhen, CADD)-clinical significance (Clinvar)-dbSNP identifiers-allele frequencies (GnomAD)  
-:tools: `SnpEFF` `SnpSift` **`Extraeff`**   
+🔧 `SnpEFF` `SnpSift` **`Extraeff`**   
 >
->       Extraeff:è un tool custom utilizzato per coinciliare i comportamenti dei 
+>       📖 Extraeff:è un tool custom utilizzato per coinciliare i comportamenti dei 
 >       diversi tool di annotazione e armonizzare il formato di annotazione del vcf, cosi da 
 >       renderlo analizzabile dal tool Rabdomyzer. Extraeff ricerca le annotazioni di SnpSift 
 >       che sono elencate nel file di annotazione e le integra nelle annotazioni di SnpEFF,
@@ -50,7 +50,7 @@ It enables filtering variants based on minor allele frequency (MAF) and establis
 At the end of the process, Rabdomyzer generates outputs of variant interpretation results in text format splitted in herezygous, homozygous and (if possible) compound heterozygous genetic variants and an excel file merging all txt outputs.  
 :tools: `Rabdomyzer`
 
-## :computer: Lanciare un workflow condiviso <a name="workflow1"></a>
+## 🖥️ Lanciare un workflow condiviso <a name="workflow1"></a>
 * Dalla barra di menù in alto click **Shared Data** e dal menù a tendina click **Data Libraries**
 * Click sulla cartella **corso_aosp**
 * Seleziona "sample1" e "sample2" e click **Export to History as a Collection**. Creare una collection come **List** e assegnare un nome (es:Fastq)
@@ -71,7 +71,7 @@ Quindi click su **Run Workflow**
 
 ![immagine](https://user-images.githubusercontent.com/89908049/151394762-50f1cb92-bc21-4ad4-9ce6-1ac83b57666b.png)
 
-## :computer: Creare un workflow combinando più subworkflow <a name="workflow2"></a>
+## 🖥️ Creare un workflow combinando più subworkflow <a name="workflow2"></a>
 * Per importare un workflow condiviso click **Shared Data** e dal menù a tendina click **Workflows**
 * Click sul workflow **Calling to create a multi-sample VCF** e dalla menù a tendina click **Import**. Una volta completata l'operazione ritorna alla pagina precedente.
 * Ripetere la stessa operazione anche per i workflow **Variant annotation** e **Rabdomyzer**
@@ -89,7 +89,7 @@ Quindi click su **Run Workflow**
 ![immagine](https://user-images.githubusercontent.com/89908049/151402844-03c02d50-d921-41f5-9c27-d60b0b2b7288.png)
 
 * Per inserire i file target e quelli di annotazione richiesti nel subworkflow per l'annotazione e/o da Rabdomyzer, slezionare **Input dataset** dalla sezione **Inputs**.  
-> :exclamation: è importante assegare una **Label** a tutti i dataset di input.
+> ❗ è importante assegare una **Label** a tutti i dataset di input.
 
 ![immagine](https://user-images.githubusercontent.com/89908049/151403771-3fd2f772-796d-4346-96cd-5c3e92e33804.png)
 
@@ -98,15 +98,15 @@ Quindi click su **Run Workflow**
 * Prima di lanciare il workflow, fare l'import all'interno della propria History dei file di annotazione richiesti:
    - `Shared Data`  
    - `Data Libraries` 
-      - :file_folder: corso_aosp 
-         - :file_folder: Annotation 
-           - :page_facing_up: spunta tutti i file 
-           - :closed_book: `Export to History` 
+      - 📁 corso_aosp 
+         - 📁 Annotation 
+           - 📄 spunta tutti i file 
+           - 📘 `Export to History` 
            - `as Datasets` 
     - `Data Libraries`
-       - :file_folder: VCF database
-         - :page_facing_up: spunta _"clinvar_20210718.vcf"_ e _"gnomad.exomes.r2.1.1.sites_customann.vcf"_
-         - :closed_book: `Export to History`
+       - 📁 VCF database
+         - 📄 spunta _"clinvar_20210718.vcf"_ e _"gnomad.exomes.r2.1.1.sites_customann.vcf"_
+         - 📘 `Export to History`
          - - `as Datasets` 
 
 * Dalla schermata principale, click **Workflow** e dalla lista selezionare quello appena creato.
@@ -115,9 +115,9 @@ Quindi click su **Run Workflow**
 
  ![immagine](https://user-images.githubusercontent.com/89908049/151519731-385e320b-ddb9-4e86-bb95-f2784078f662.png)
 
-## :computer: Utilizzo di Rabdomyzer in Galaxy <a name="Rabdomyzer"></a>
+## 🖥️  Utilizzo di Rabdomyzer in Galaxy <a name="Rabdomyzer"></a>
 
-> :book: Rabdomyzer è un programma "custom" sviluppato per interpretare le varianti a singolo nucleotide (SNV) e le piccole inserzioni e delezioni (InDels), semplificando la visualizzazione dei risultati NGS.
+> 📖 Rabdomyzer è un programma "custom" sviluppato per interpretare le varianti a singolo nucleotide (SNV) e le piccole inserzioni e delezioni (InDels), semplificando la visualizzazione dei risultati NGS.
 Consente di filtrare le varianti in base alla frequenza degli alleli minori (MAF) e al modello di ereditarietà stabilito, definito nel file model specificato.
 Il modello potrà essere:  
  **_"trio"_** se nelle colonne dei genitori verrà specificato il loro ID (_variant and gene based analysis_)
@@ -130,9 +130,9 @@ Il modello potrà essere:
 * Per iniziare importare nella propria History il file vcf condiviso negli `Shared Data`:
  - `Shared Data`  
    - `Data Libraries` 
-      - :file_folder: corso_aosp
-         - :page_facing_up: spunta _"vcf_multisample.vcf"
-         - :closed_book: `Export to History`
+      - 📁 corso_aosp
+         - 📄 spunta _"vcf_multisample.vcf"
+         - 📘 `Export to History`
          - `as Datasets` 
 * Crea un file model come da esempio
 
@@ -140,7 +140,7 @@ Il modello potrà essere:
 | ------ | ------ | ------ | ------ | ------ |
 | BE45 | 0 | 0 | 0 | 0 |
 
-:exclamation: utilizzare il TAB come separatore 
+❗ utilizzare il TAB come separatore 
 
 * Richiamare il tool **Rabdomyzer** dalla sezione **Tools** nella schermata principale della nostra istanza Galaxy
 * Click su **Rabdomyzer filtration**
@@ -148,4 +148,4 @@ Il modello potrà essere:
 
 ![immagine](https://user-images.githubusercontent.com/89908049/151532146-519cf3c9-867c-4702-80dd-1fdd8512cf6f.png)
 
-* :eye: visualizzare il file excel ottenuto
+* 👁️ visualizzare il file excel ottenuto
